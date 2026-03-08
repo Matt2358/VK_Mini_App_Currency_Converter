@@ -3,19 +3,25 @@ import bridge from '@vkontakte/vk-bridge';
 import { View, SplitLayout, SplitCol, ScreenSpinner } from '@vkontakte/vkui';
 import { useActiveVkuiLocation } from '@vkontakte/vk-mini-apps-router';
 
-import { Persik, Home } from './panels';
+import { Converter } from './panels/Converter';
 import { DEFAULT_VIEW_PANELS } from './routes';
 
 export const App = () => {
-  const { panel: activePanel = DEFAULT_VIEW_PANELS.HOME } = useActiveVkuiLocation();
+  const { panel: activePanel = DEFAULT_VIEW_PANELS.Converter } = useActiveVkuiLocation();
   const [fetchedUser, setUser] = useState();
-  const [popout, setPopout] = useState(<ScreenSpinner />);
+  const [popout, setPopout] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
-      const user = await bridge.send('VKWebAppGetUserInfo');
-      setUser(user);
-      setPopout(null);
+      try {
+        const user = await bridge.send('VKWebAppGetUserInfo');
+        setUser(user);
+      } catch (e) {
+        console.warn('VK Bridge недоступен, работаем без данных пользователя');
+        // можно установить тестовые данные или просто оставить undefined
+      } finally {
+        setPopout(null);
+      }
     }
     fetchData();
   }, []);
@@ -24,8 +30,7 @@ export const App = () => {
     <SplitLayout>
       <SplitCol>
         <View activePanel={activePanel}>
-          <Home id="home" fetchedUser={fetchedUser} />
-          <Persik id="persik" />
+          <Converter id="converter" fetchedUser={fetchedUser} />
         </View>
       </SplitCol>
       {popout}
