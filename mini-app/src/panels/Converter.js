@@ -199,13 +199,13 @@ export const Converter = ({ id }) => {
   };
 
   // Конвертация
-  const convert = () => {
-    const numAmount = parseFloat(amount) || 0;
-    if (numAmount === 0) return '0';
-    if (!rates[fromCurrency] || !rates[toCurrency]) return '—';
-    const inRUB = numAmount / rates[fromCurrency];
-    return (inRUB * rates[toCurrency]).toFixed(2);
-  };
+const convert = () => {
+  const numAmount = parseFloat(amount) || 0;
+  if (numAmount === 0) return '0';
+  if (!rates[fromCurrency] || !rates[toCurrency]) return '—';
+  const result = (numAmount * rates[fromCurrency]) / rates[toCurrency];
+  return result.toFixed(2);
+};
 
   const result = convert();
 
@@ -219,7 +219,7 @@ export const Converter = ({ id }) => {
     <Panel id={id}>
       <PanelHeader>Конвертер валют</PanelHeader>
       <Group>
-        <FormItem top="Сумма">
+        <FormItem top="Количество:">
           <Input
             type="number"
             value={amount}
@@ -229,7 +229,7 @@ export const Converter = ({ id }) => {
           />
         </FormItem>
 
-        <FormItem top="Из">
+        <FormItem top="ИЗ">
           <Select
             value={fromCurrency}
             onChange={(e) => setFromCurrency(e.target.value)}
