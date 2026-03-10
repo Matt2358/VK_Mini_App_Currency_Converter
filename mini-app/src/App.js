@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import { View, SplitLayout, SplitCol, ScreenSpinner } from '@vkontakte/vkui';
+import { View, SplitLayout, SplitCol } from '@vkontakte/vkui';
 import { useActiveVkuiLocation } from '@vkontakte/vk-mini-apps-router';
 
 import { Converter } from './panels/Converter';

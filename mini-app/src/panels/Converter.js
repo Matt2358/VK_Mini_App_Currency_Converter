@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Panel,
   PanelHeader,
@@ -9,11 +9,13 @@ import {
   Button,
   Div,
   Text,
-  Spinner,
   Placeholder,
 } from '@vkontakte/vkui';
 import { Icon28RepeatOutline } from '@vkontakte/icons';
 import PropTypes from 'prop-types';
+import { Icon28FavoriteOutline, Icon28Favorite, Icon16Cancel } from '@vkontakte/icons';
+import { IconButton, Cell, Header } from '@vkontakte/vkui';
+import { useFavorites } from '../hooks/useFavorites';
 
 // Конфигурация валют
 const CURRENCIES = {
@@ -156,6 +158,10 @@ export const Converter = ({ id }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const currentPair = { from: fromCurrency, to: toCurrency };
+  const isFavorite = favorites.some(p => p.from === currentPair.from && p.to === currentPair.to);
+
   // Загрузка курсов валют
   useEffect(() => {
     fetchRates();
@@ -187,6 +193,7 @@ export const Converter = ({ id }) => {
     } catch (err) {
       console.error(err);
       setError('Не удалось загрузить курсы. Используются сохранённые данные.');
+
       // Используем запасные курсы
       const fallbackRates = { RUB: 1 };
       Object.entries(FALLBACK_RATES).forEach(([code, rate]) => {
@@ -267,11 +274,16 @@ const convert = () => {
         </Div>
 
         {!loading && rates[fromCurrency] && rates[toCurrency] && (
-          <Div>
-            <Text style={{ textAlign: 'center', color: 'var(--text_secondary)' }}>
-              1 {fromCurrency} = {(rates[toCurrency] / rates[fromCurrency]).toFixed(4)} {toCurrency}
-            </Text>
-          </Div>
+
+        <Div>
+          <Text style={{ textAlign: 'center', color: 'var(--text_secondary)' }}>
+            1 {fromCurrency} = {(rates[toCurrency] / rates[fromCurrency]).toFixed(4)} {toCurrency}
+          </Text>
+
+          <IconButton onClick={() => isFavorite ? removeFavorite(currentPair) : addFavorite(currentPair)}>
+            {isFavorite ? <Icon28Favorite /> : <Icon28FavoriteOutline />}
+          </IconButton>
+        </Div>
         )}
 
         {lastUpdate && (
@@ -299,6 +311,23 @@ const convert = () => {
             {loading ? 'Загрузка...' : 'Обновить курсы'}
           </Button>
         </Div>
+
+        <Group>
+          <Header mode="secondary">Избранные пары</Header>
+          {favorites.map(pair => (
+            <Cell
+              key={`${pair.from}-${pair.to}`}
+              onClick={() => {
+                setFromCurrency(pair.from);
+                setToCurrency(pair.to);
+              }}
+              after={<IconButton onClick={(e) => { e.stopPropagation(); removeFavorite(pair); }}><Icon16Cancel /></IconButton>}
+            >
+              {pair.from} → {pair.to}
+            </Cell>
+          ))}
+        </Group>
+        
       </Group>
     </Panel>
   );

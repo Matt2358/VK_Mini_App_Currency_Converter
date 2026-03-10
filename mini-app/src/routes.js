@@ -5,7 +5,6 @@ import {
   createView,
   RoutesConfig,
 } from '@vkontakte/vk-mini-apps-router';
-import { Converter } from './panels/Converter';
 
 export const DEFAULT_ROOT = 'default_root';
 
